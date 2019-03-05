@@ -52,3 +52,24 @@ func Create(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespon
 	response, _ := json.Marshal(bk)
 	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: 201}, nil
 }
+
+//GetChildren returns childrens from giving parent
+func GetChildren(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	db := GetDB()
+	result, err := db.Scan(&dynamodb.ScanInput{
+		TableName: aws.String("gkChild"),
+	})
+	if err != nil {
+		fmt.Println("Got error calling PutItem:")
+		fmt.Println(err.Error())
+	}
+
+	children := []Child{}
+	for _, i := range result.Items {
+		child := Child{}
+		err = dynamodbattribute.UnmarshalMap(i, &child)
+		children = append(children, child)
+	}
+	response, _ := json.Marshal(&children)
+	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: 200}, nil
+}

@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
+//GetDB returns a dynamo db connection
 func GetDB() *dynamodb.DynamoDB {
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("us-east-1")},

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/andersonlira/stockids/db"
+	"github.com/andersonlira/stockids/model"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -62,9 +63,9 @@ func GetChildren(request events.APIGatewayProxyRequest) (events.APIGatewayProxyR
 		fmt.Println(err.Error())
 	}
 
-	children := []Child{}
+	children := []model.Child{}
 	for _, i := range result.Items {
-		child := Child{}
+		child := model.Child{}
 		err = dynamodbattribute.UnmarshalMap(i, &child)
 		children = append(children, child)
 	}

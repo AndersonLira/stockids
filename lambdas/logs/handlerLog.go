@@ -12,12 +12,12 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-//Handler implements GenericHandler
-type Handler struct {
+//HandlerLog implements GenericHandler
+type HandlerLog struct {
 }
 
 //Get interface implementation
-func (h Handler) Get(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func (h HandlerLog) Get(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ddb := db.GetDB()
 	result, err := ddb.Query(&dynamodb.QueryInput{
 		TableName:              aws.String("skLog"),
@@ -44,16 +44,16 @@ func (h Handler) Get(request events.APIGatewayProxyRequest) (events.APIGatewayPr
 }
 
 //Create interface implementation
-func (h Handler) Create(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func (h HandlerLog) Create(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	panic("Create not implemented yet")
 }
 
 //Update interface implementation
-func (h Handler) Update(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func (h HandlerLog) Update(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	panic("Create not implemented yet")
 }
 
 //Delete interface implementation
-func (h Handler) Delete(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func (h HandlerLog) Delete(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	panic("Create not implemented yet")
 }

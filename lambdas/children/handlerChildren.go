@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/andersonlira/goutils/str"
 	"github.com/andersonlira/stockids/db"
 	"github.com/andersonlira/stockids/model"
 	"github.com/aws/aws-lambda-go/events"
@@ -51,6 +52,7 @@ func (h HandlerChildren) Create(request events.APIGatewayProxyRequest) (events.A
 		return events.APIGatewayProxyResponse{}, err
 	}
 
+	child.ID = str.NewUUID()
 	av, err := dynamodbattribute.MarshalMap(child)
 
 	if err != nil {

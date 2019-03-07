@@ -19,9 +19,11 @@ type HandlerChildren struct {
 }
 
 const table = "skChild"
+const pathParam = "parentId"
 
 //Get interface implementation
 func (h HandlerChildren) Get(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+
 	ddb := db.GetDB()
 	result, err := ddb.Scan(&dynamodb.ScanInput{
 		TableName: aws.String(table),
@@ -43,7 +45,10 @@ func (h HandlerChildren) Get(request events.APIGatewayProxyRequest) (events.APIG
 
 //Create interface implementation
 func (h HandlerChildren) Create(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	ddb := db.GetDB()
+	parentID, errPath := request.PathParameters[pathParam]
+	if !errPath {
+		return events.APIGatewayProxyResponse{Body: string(parentID), StatusCode: http.StatusBadRequest}, nil
+	}
 
 	child := model.Child{}
 	err := json.Unmarshal([]byte(request.Body), &child)
@@ -53,6 +58,7 @@ func (h HandlerChildren) Create(request events.APIGatewayProxyRequest) (events.A
 	}
 
 	child.ID = str.NewUUID()
+	child.ParentID = parentID
 	av, err := dynamodbattribute.MarshalMap(child)
 
 	if err != nil {
@@ -65,6 +71,7 @@ func (h HandlerChildren) Create(request events.APIGatewayProxyRequest) (events.A
 		TableName: aws.String(table),
 	}
 
+	ddb := db.GetDB()
 	_, err = ddb.PutItem(input)
 
 	if err != nil {

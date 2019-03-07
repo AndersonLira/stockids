@@ -1,9 +1,11 @@
 package main
 
 import (
+	"github.com/andersonlira/stockids/lambdas"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
 func main() {
-	lambda.Start(Get)
+	gh := lambdas.GenericHandler{Handlerable: Handler{}}
+	lambda.Start(gh.Handler)
 }

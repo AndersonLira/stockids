@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/andersonlira/stockids/db"
 	"github.com/andersonlira/stockids/model"
@@ -16,14 +17,16 @@ import (
 type HandlerChildren struct {
 }
 
+const table = "skChild"
+
 //Get interface implementation
 func (h HandlerChildren) Get(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ddb := db.GetDB()
 	result, err := ddb.Scan(&dynamodb.ScanInput{
-		TableName: aws.String("skChild"),
+		TableName: aws.String(table),
 	})
 	if err != nil {
-		fmt.Println("Got error calling PutItem:")
+		fmt.Println("Error getting children")
 		fmt.Println(err.Error())
 	}
 
@@ -39,44 +42,35 @@ func (h HandlerChildren) Get(request events.APIGatewayProxyRequest) (events.APIG
 
 //Create interface implementation
 func (h HandlerChildren) Create(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	panic("Create not implemented yet")
-	// 	svc := GetDB()
+	ddb := db.GetDB()
 
-	// 	items := []model.Account{model.Account{ID: str.NewUUID(), Name: "Account 1"}}
+	child := model.Child{}
+	err := json.Unmarshal([]byte(request.Body), &child)
 
-	// 	// Add each item to Movies table:
-	// 	for _, item := range items {
-	// 		av, err := dynamodbattribute.MarshalMap(item)
+	if err != nil {
+		return events.APIGatewayProxyResponse{}, err
+	}
 
-	// 		if err != nil {
-	// 			fmt.Println("Got error marshalling map:")
-	// 			fmt.Println(err.Error())
-	// 			os.Exit(1)
-	// 		}
+	av, err := dynamodbattribute.MarshalMap(child)
 
-	// 		// Create item in table Movies
-	// 		input := &dynamodb.PutItemInput{
-	// 			Item:      av,
-	// 			TableName: aws.String("accounts"),
-	// 		}
+	if err != nil {
+		return events.APIGatewayProxyResponse{}, err
+	}
 
-	// 		_, err = svc.PutItem(input)
+	// Create item in table Movies
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String(table),
+	}
 
-	// 		if err != nil {
-	// 			fmt.Println("Got error calling PutItem:")
-	// 			fmt.Println(err.Error())
-	// 			os.Exit(1)
-	// 		}
+	_, err = ddb.PutItem(input)
 
-	// 		fmt.Println("Successfully added '", item.Name)
-	// 	}
+	if err != nil {
+		return events.APIGatewayProxyResponse{}, err
+	}
 
-	// 	bk := &message{
-	// 		Title:   "Message",
-	// 		Message: "Showing message",
-	// 	}
-	// 	response, _ := json.Marshal(bk)
-	// 	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: 201}, nil
+	response, _ := json.Marshal(child)
+	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusCreated}, nil
 
 }
 

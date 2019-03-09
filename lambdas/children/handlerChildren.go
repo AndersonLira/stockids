@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/andersonlira/stockids/lambdas"
+
 	"github.com/andersonlira/goutils/str"
 	"github.com/andersonlira/stockids/db"
 	"github.com/andersonlira/stockids/model"
@@ -12,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
 )
 
 //HandlerChildren implements GenericHandler
@@ -23,11 +26,26 @@ const pathParam = "parentId"
 
 //Get interface implementation
 func (h HandlerChildren) Get(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	parentID, errPath := request.PathParameters[pathParam]
+	if !errPath {
+		return lambdas.InvalidPathParam()
+	}
 
 	ddb := db.GetDB()
-	result, err := ddb.Scan(&dynamodb.ScanInput{
-		TableName: aws.String(table),
-	})
+
+	filt := expression.Name("parent_id").Equal(expression.Value(parentID))
+	//proj := expression.NamesList(expression.Name("title"), expression.Name("year"), expression.Name("info.rating"))
+	expr, err := expression.NewBuilder().WithFilter(filt).Build()
+
+	params := &dynamodb.ScanInput{
+		ExpressionAttributeValues: expr.Values(),
+		ExpressionAttributeNames:  expr.Names(),
+		FilterExpression:          expr.Filter(),
+		ProjectionExpression:      expr.Projection(),
+		TableName:                 aws.String(table),
+	}
+
+	result, err := ddb.Scan(params)
 	if err != nil {
 		fmt.Println("Error getting children")
 		fmt.Println(err.Error())

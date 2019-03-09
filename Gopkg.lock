@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/andersonlira/goutils"
+  packages = ["str"]
+  revision = "130dcb7f6a2bad1278a79752ee4ddec17ca6065c"
+
+[[projects]]
   name = "github.com/aws/aws-lambda-go"
   packages = [
     "events",
@@ -49,6 +55,7 @@
     "private/protocol/xml/xmlutil",
     "service/dynamodb",
     "service/dynamodb/dynamodbattribute",
+    "service/dynamodb/expression",
     "service/sts"
   ]
   revision = "6ff66bb2b8ac90ac25b1dbbf9806f09651630789"
@@ -59,9 +66,28 @@
   packages = ["."]
   revision = "c2b33e84"
 
+[[projects]]
+  branch = "master"
+  name = "github.com/xrash/smetrics"
+  packages = ["."]
+  revision = "a3153f7040e90324c58c6287535e26a0ac5c1cc1"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "internal/gen",
+    "internal/triegen",
+    "internal/ucd",
+    "transform",
+    "unicode/cldr",
+    "unicode/norm"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "340844de6ca6a91ab26c5fbd70b28b645c9ab8c36d8bf30e950b5e7d1190514e"
+  inputs-digest = "9f783a1bad4c916cd8163b2a9e41ec9c32d034a20721d7a14fdb534ecbd8418f"
   solver-name = "gps-cdcl"
   solver-version = 1

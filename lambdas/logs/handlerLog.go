@@ -84,7 +84,7 @@ func (h HandlerLog) Create(request events.APIGatewayProxyRequest) (events.APIGat
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err
 	}
-
+	UpdateLogTotal(childID, log.Score)
 	response, _ := json.Marshal(log)
 	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusCreated}, nil
 

@@ -3,7 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"time"
 
+	"github.com/andersonlira/goutils/str"
 	"github.com/andersonlira/stockids/db"
 	"github.com/andersonlira/stockids/model"
 	"github.com/aws/aws-lambda-go/events"
@@ -11,6 +14,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
+
+const childParam = "childId"
+const table = "skLog"
 
 //HandlerLog implements GenericHandler
 type HandlerLog struct {
@@ -20,7 +26,7 @@ type HandlerLog struct {
 func (h HandlerLog) Get(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ddb := db.GetDB()
 	result, err := ddb.Query(&dynamodb.QueryInput{
-		TableName:              aws.String("skLog"),
+		TableName:              aws.String(table),
 		KeyConditionExpression: aws.String("child_id = :a"),
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":a": {
@@ -45,7 +51,43 @@ func (h HandlerLog) Get(request events.APIGatewayProxyRequest) (events.APIGatewa
 
 //Create interface implementation
 func (h HandlerLog) Create(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	panic("Create not implemented yet")
+	childID, errPath := request.PathParameters[childParam]
+	if !errPath {
+		return events.APIGatewayProxyResponse{Body: string(childID), StatusCode: http.StatusBadRequest}, nil
+	}
+
+	log := model.Log{}
+	err := json.Unmarshal([]byte(request.Body), &log)
+
+	if err != nil {
+		return events.APIGatewayProxyResponse{}, err
+	}
+
+	log.ID = str.NewUUID()
+	log.ChildID = childID
+	log.Date = time.Now()
+	av, err := dynamodbattribute.MarshalMap(log)
+
+	if err != nil {
+		return events.APIGatewayProxyResponse{}, err
+	}
+
+	// Create item in table Movies
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String(table),
+	}
+
+	ddb := db.GetDB()
+	_, err = ddb.PutItem(input)
+
+	if err != nil {
+		return events.APIGatewayProxyResponse{}, err
+	}
+
+	response, _ := json.Marshal(log)
+	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusCreated}, nil
+
 }
 
 //Update interface implementation

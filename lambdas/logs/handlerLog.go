@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -24,28 +23,12 @@ type HandlerLog struct {
 
 //Get interface implementation
 func (h HandlerLog) Get(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	ddb := db.GetDB()
-	result, err := ddb.Query(&dynamodb.QueryInput{
-		TableName:              aws.String(table),
-		KeyConditionExpression: aws.String("child_id = :a"),
-		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
-			":a": {
-				S: aws.String("31ed531d-0df4-4fd8-98e0-02bb1d9e68b5"),
-			},
-		},
-	})
-	if err != nil {
-		fmt.Println("Got error querying logs")
-		fmt.Println(err.Error())
+	childID, _ := request.PathParameters[childParam]
+	payload := map[string]interface{}{
+		"logs":  getLogs(childID),
+		"total": getLogTotal(childID),
 	}
-
-	logs := []model.Log{}
-	for _, i := range result.Items {
-		log := model.Log{}
-		err = dynamodbattribute.UnmarshalMap(i, &log)
-		logs = append(logs, log)
-	}
-	response, _ := json.Marshal(&logs)
+	response, _ := json.Marshal(&payload)
 	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: 200}, nil
 }
 

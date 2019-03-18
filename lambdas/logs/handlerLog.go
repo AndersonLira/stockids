@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/andersonlira/goutils/str"
 	"github.com/andersonlira/stockids/db"
 	"github.com/andersonlira/stockids/model"
 	"github.com/aws/aws-lambda-go/events"
@@ -46,9 +45,8 @@ func (h HandlerLog) Create(request events.APIGatewayProxyRequest) (events.APIGat
 		return events.APIGatewayProxyResponse{}, err
 	}
 
-	log.ID = str.NewUUID()
 	log.ChildID = childID
-	log.Date = time.Now()
+	log.Date = time.Now().Unix()
 	av, err := dynamodbattribute.MarshalMap(log)
 
 	if err != nil {

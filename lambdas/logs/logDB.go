@@ -16,6 +16,8 @@ func getLogs(childID string) []model.Log {
 	result, err := ddb.Query(&dynamodb.QueryInput{
 		TableName:              aws.String(table),
 		KeyConditionExpression: aws.String("child_id = :a"),
+		Limit:            aws.Int64(30),
+		ScanIndexForward: aws.Bool(false),
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":a": {
 				S: aws.String(childID),

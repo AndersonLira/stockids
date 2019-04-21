@@ -5,12 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/andersonlira/stockids/db"
 	"github.com/andersonlira/stockids/model"
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
 const childParam = "childId"
@@ -47,25 +43,13 @@ func (h HandlerLog) Create(request events.APIGatewayProxyRequest) (events.APIGat
 
 	log.ChildID = childID
 	log.Date = time.Now().Unix()
-	av, err := dynamodbattribute.MarshalMap(log)
+
+	log, err = createLog(log)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err
 	}
 
-	// Create item in table Movies
-	input := &dynamodb.PutItemInput{
-		Item:      av,
-		TableName: aws.String(table),
-	}
-
-	ddb := db.GetDB()
-	_, err = ddb.PutItem(input)
-
-	if err != nil {
-		return events.APIGatewayProxyResponse{}, err
-	}
-	UpdateLogTotal(childID, log.Score)
 	response, _ := json.Marshal(log)
 	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusCreated}, nil
 

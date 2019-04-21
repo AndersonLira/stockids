@@ -37,3 +37,25 @@ func getLogs(childID string) []model.Log {
 	}
 	return logs
 }
+
+func createLog(log model.Log) (model.Log, error) {
+	log.Message = "altered"
+	av, err := dynamodbattribute.MarshalMap(log)
+	if err != nil {
+		return model.Log{}, err
+	}
+
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String(table),
+	}
+
+	ddb := db.GetDB()
+	_, err = ddb.PutItem(input)
+
+	if err != nil {
+		return model.Log{}, err
+	}
+	UpdateLogTotal(log.ChildID, log.Score)
+	return log, nil
+}

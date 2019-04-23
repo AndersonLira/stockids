@@ -46,7 +46,7 @@ func getLogsByQuery(queryInput *dynamodb.QueryInput) []model.Log {
 func createLog(log model.Log) (model.Log, error) {
 
 	if existLastMinutes(log.ChildID) {
-		return model.Log{}, &lambdas.ConflictError{}
+		return model.Log{}, lambdas.ConflictError{}
 	}
 
 	av, err := dynamodbattribute.MarshalMap(log)

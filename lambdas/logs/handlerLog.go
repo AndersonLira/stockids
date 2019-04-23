@@ -49,10 +49,11 @@ func (h HandlerLog) Create(request events.APIGatewayProxyRequest) (events.APIGat
 	log, err = createLog(log)
 
 	if err != nil {
-		if _, ok := err.(lambdas.ConflictError); !ok {
-			return events.APIGatewayProxyResponse{StatusCode: http.StatusConflict}, err
+
+		if _, ok := err.(lambdas.ConflictError); ok {
+			return lambdas.Conflict()
 		}
-		return events.APIGatewayProxyResponse{StatusCode: http.StatusInternalServerError}, err
+		return events.APIGatewayProxyResponse{}, err
 	}
 
 	response, _ := json.Marshal(log)

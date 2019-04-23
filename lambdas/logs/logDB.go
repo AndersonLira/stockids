@@ -12,18 +12,18 @@ import (
 
 func getLogs(childID string) []model.Log {
 
+	queryInput := defaultLogQuery()
+	queryInput.KeyConditionExpression = aws.String("child_id = :a")
+	queryInput.ExpressionAttributeValues[":a"] = &dynamodb.AttributeValue{
+		S: aws.String(childID),
+	}
+	return getLogsByQuery(queryInput)
+}
+
+func getLogsByQuery(queryInput *dynamodb.QueryInput) []model.Log {
 	ddb := db.GetDB()
-	result, err := ddb.Query(&dynamodb.QueryInput{
-		TableName:              aws.String(table),
-		KeyConditionExpression: aws.String("child_id = :a"),
-		Limit:            aws.Int64(30),
-		ScanIndexForward: aws.Bool(false),
-		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
-			":a": {
-				S: aws.String(childID),
-			},
-		},
-	})
+	result, err := ddb.Query(queryInput)
+
 	if err != nil {
 		fmt.Println("Got error querying logs")
 		fmt.Println(err.Error())
@@ -36,10 +36,11 @@ func getLogs(childID string) []model.Log {
 		logs = append(logs, log)
 	}
 	return logs
+
 }
 
 func createLog(log model.Log) (model.Log, error) {
-	log.Message = "altered"
+
 	av, err := dynamodbattribute.MarshalMap(log)
 	if err != nil {
 		return model.Log{}, err
@@ -58,4 +59,25 @@ func createLog(log model.Log) (model.Log, error) {
 	}
 	UpdateLogTotal(log.ChildID, log.Score)
 	return log, nil
+}
+
+// func existLastMinutes() (exist bool) {
+// 	now := time.Now()
+// 	before := now.Add(-5 * time.Minute).Unix()
+
+// 	return exist
+// }
+
+func defaultLogQuery() *dynamodb.QueryInput {
+	return &dynamodb.QueryInput{
+		TableName: aws.String(table),
+		//KeyConditionExpression: aws.String("child_id = :a"),
+		Limit:                     aws.Int64(30),
+		ScanIndexForward:          aws.Bool(false),
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			// ":a": {
+			// 	S: aws.String(childID),
+			// },
+		},
+	}
 }

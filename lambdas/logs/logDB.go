@@ -73,7 +73,12 @@ func existLastMinutes(childID string) (exist bool) {
 	now := time.Now()
 	before := now.Add(-5 * time.Minute).Unix()
 	queryInput := defaultLogQuery()
-	queryInput.KeyConditionExpression = aws.String("child_id = :a and date > :d")
+
+	d := "date"
+	queryInput.ExpressionAttributeNames = map[string]*string{
+		"#d": &d,
+	}
+	queryInput.KeyConditionExpression = aws.String("child_id = :a and #d >= :d")
 
 	queryInput.ExpressionAttributeValues[":a"] = &dynamodb.AttributeValue{
 		S: aws.String(childID),

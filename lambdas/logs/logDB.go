@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"strconv"
+	"time"
+
+	"github.com/andersonlira/stockids/lambdas"
 
 	"github.com/andersonlira/stockids/db"
 	"github.com/andersonlira/stockids/model"
@@ -41,6 +45,10 @@ func getLogsByQuery(queryInput *dynamodb.QueryInput) []model.Log {
 
 func createLog(log model.Log) (model.Log, error) {
 
+	if existLastMinutes(log.ChildID) {
+		return model.Log{}, &lambdas.ConflictError{}
+	}
+
 	av, err := dynamodbattribute.MarshalMap(log)
 	if err != nil {
 		return model.Log{}, err
@@ -61,12 +69,21 @@ func createLog(log model.Log) (model.Log, error) {
 	return log, nil
 }
 
-// func existLastMinutes() (exist bool) {
-// 	now := time.Now()
-// 	before := now.Add(-5 * time.Minute).Unix()
+func existLastMinutes(childID string) (exist bool) {
+	now := time.Now()
+	before := now.Add(-5 * time.Minute).Unix()
+	queryInput := defaultLogQuery()
+	queryInput.KeyConditionExpression = aws.String("child_id = :a and date > :d")
 
-// 	return exist
-// }
+	queryInput.ExpressionAttributeValues[":a"] = &dynamodb.AttributeValue{
+		S: aws.String(childID),
+	}
+	queryInput.ExpressionAttributeValues[":d"] = &dynamodb.AttributeValue{
+		N: aws.String(strconv.FormatInt(before, 10)),
+	}
+
+	return len(getLogsByQuery(queryInput)) > 0
+}
 
 func defaultLogQuery() *dynamodb.QueryInput {
 	return &dynamodb.QueryInput{

@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	gh := lambdas.GenericHandler{Handlerable: HandlerFamily{}}
+	gh := lambdas.GenericHandler{Handlerable: FamilyHandler{}}
 	lambda.Start(gh.Handler)
 }

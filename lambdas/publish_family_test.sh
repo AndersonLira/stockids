@@ -11,3 +11,9 @@ aws lambda invoke --function-name "$1"  --payload '{"pathParameters":{"childId":
 created=$(</tmp/$1_post.json)
 echo $created
 echo
+
+echo DELETE
+aws lambda invoke --function-name "$1"  --payload '{"pathParameters":{"id":"0b74c95f-7357-43e0-a1b7-90b6d0e9978a"},"queryStringParameters":{"token":"ianianso290801"},"httpMethod":"DELETE"}' /tmp/$1_delete.json && \
+cat /tmp/$1_delete.json
+
+echo

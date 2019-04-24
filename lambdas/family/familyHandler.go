@@ -55,5 +55,11 @@ func (h FamilyHandler) Update(request events.APIGatewayProxyRequest) (events.API
 
 //Delete interface implementation
 func (h FamilyHandler) Delete(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	panic("Create not implemented yet")
+	userID := "teste"
+	id, _ := request.PathParameters["id"]
+	if deleteAllFamiliesOfUser(id, userID) {
+		return events.APIGatewayProxyResponse{Body: "true", StatusCode: http.StatusOK}, nil
+	}
+	return events.APIGatewayProxyResponse{Body: "false", StatusCode: http.StatusNotFound}, nil
+
 }

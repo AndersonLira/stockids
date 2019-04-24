@@ -63,6 +63,28 @@ func createFamily(family model.Family) (model.Family, error) {
 	return family, nil
 }
 
+func deleteAllFamiliesOfUser(id string, userID string) bool {
+	input := &dynamodb.DeleteItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(id),
+			},
+			"user_id": {
+				S: aws.String(userID),
+			},
+		},
+		TableName: aws.String(table),
+	}
+	ddb := db.GetDB()
+	_, err := ddb.DeleteItem(input)
+
+	if err != nil {
+		panic(err)
+		return false
+	}
+	return true
+}
+
 func defaultFamilyQuery() *dynamodb.QueryInput {
 	return &dynamodb.QueryInput{
 		TableName:                 aws.String(table),

@@ -35,6 +35,7 @@ func (h FamilyHandler) Create(request events.APIGatewayProxyRequest) (events.API
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err
 	}
+	family.UserIDS = []string{"teste"}
 
 	family, err = createFamily(family)
 

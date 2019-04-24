@@ -8,5 +8,6 @@ echo
 
 echo POST
 aws lambda invoke --function-name "$1"  --payload '{"pathParameters":{"childId":"teste"},"queryStringParameters":{"token":"ianianso290801"},"httpMethod":"POST","body":"{\"id\":\"\",\"name\":\"Family A\",\"description\":\"A test family\",\"avatar\":\"none\"}"}' /tmp/$1_post.json && \
-cat /tmp/$1_post.json
+created=$(</tmp/$1_post.json)
+echo $created
 echo

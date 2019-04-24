@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/andersonlira/goutils"
   packages = ["str"]
-  revision = "130dcb7f6a2bad1278a79752ee4ddec17ca6065c"
+  revision = "bf926056326da2c7e357768a2261f88e05cc38f9"
 
 [[projects]]
   name = "github.com/aws/aws-lambda-go"
@@ -16,8 +16,8 @@
     "lambda/messages",
     "lambdacontext"
   ]
-  revision = "c83699c938a36c6d111f9837be9295184efeeb2e"
-  version = "v1.9.0"
+  revision = "08d251dc58f204411d79012fd6f1beefb7107fea"
+  version = "v1.10.0"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -58,8 +58,8 @@
     "service/dynamodb/expression",
     "service/sts"
   ]
-  revision = "6ff66bb2b8ac90ac25b1dbbf9806f09651630789"
-  version = "v1.17.12"
+  revision = "ca6d5f771b63df153f02fe5b117434d5ebafeeda"
+  version = "v1.19.15"
 
 [[projects]]
   name = "github.com/jmespath/go-jmespath"

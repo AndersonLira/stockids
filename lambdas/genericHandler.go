@@ -1,21 +1,12 @@
 package lambdas
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
 )
 
 var headers = map[string]string{"Access-Control-Allow-Origin": "*"}
-
-//Handlerable must implement basic methods for crud operation
-type Handlerable interface {
-	Get(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error)
-	Create(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error)
-	Update(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error)
-	Delete(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error)
-}
 
 //GenericHandler is basic implementation for crud calls
 type GenericHandler struct {
@@ -28,13 +19,13 @@ func (gh *GenericHandler) Handler(request events.APIGatewayProxyRequest) (events
 		panic("Handlerable nil is not allowed")
 	}
 
-	c, err := GetClaims(request)
+	// _, err := GetClaims(request)
 
-	if err == nil {
-		//b := request.RequestContext
-		response, _ := json.Marshal(&c)
-		return addHeaders(events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusAccepted}, nil)
-	}
+	// if err == nil {
+	// 	b := request.RequestContext
+	// 	response, _ := json.Marshal(&b)
+	// 	return addHeaders(events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusAccepted}, nil)
+	// }
 
 	token, ok := request.QueryStringParameters["token"]
 

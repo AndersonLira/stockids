@@ -67,6 +67,12 @@
   revision = "c2b33e84"
 
 [[projects]]
+  name = "github.com/mitchellh/mapstructure"
+  packages = ["."]
+  revision = "3536a929edddb9a5b34bd6861dc4a9647cb459fe"
+  version = "v1.1.2"
+
+[[projects]]
   branch = "master"
   name = "github.com/xrash/smetrics"
   packages = ["."]
@@ -88,6 +94,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9f783a1bad4c916cd8163b2a9e41ec9c32d034a20721d7a14fdb534ecbd8418f"
+  inputs-digest = "b05b25dd4689bd0b127d3dbdc540a43e98f3f391284e38f3df743233cd512f2b"
   solver-name = "gps-cdcl"
   solver-version = 1

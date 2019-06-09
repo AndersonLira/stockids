@@ -79,7 +79,6 @@ func deleteAllFamiliesOfUser(id string, userID string) bool {
 	_, err := ddb.DeleteItem(input)
 
 	if err != nil {
-		panic(err)
 		return false
 	}
 	return true

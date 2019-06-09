@@ -1,6 +1,7 @@
 package lambdas
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -26,7 +27,17 @@ func (gh *GenericHandler) Handler(request events.APIGatewayProxyRequest) (events
 	if gh.Handlerable == nil {
 		panic("Handlerable nil is not allowed")
 	}
+
+	c, err := GetClaims(request)
+
+	if err == nil {
+		//b := request.RequestContext
+		response, _ := json.Marshal(&c)
+		return addHeaders(events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusAccepted}, nil)
+	}
+
 	token, ok := request.QueryStringParameters["token"]
+
 	if !ok || token != "ianianso290801" {
 		return addHeaders(events.APIGatewayProxyResponse{Body: string("{\"message\":\"forbidden\""), StatusCode: http.StatusForbidden}, nil)
 	}

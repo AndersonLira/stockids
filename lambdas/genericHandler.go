@@ -19,30 +19,27 @@ func (gh *GenericHandler) Handler(request events.APIGatewayProxyRequest) (events
 		panic("Handlerable nil is not allowed")
 	}
 
-	// _, err := GetClaims(request)
+	c, err := GetClaims(request)
 
-	// if err == nil {
-	// 	b := request.RequestContext
-	// 	response, _ := json.Marshal(&b)
-	// 	return addHeaders(events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusAccepted}, nil)
-	// }
-
-	token, ok := request.QueryStringParameters["token"]
-
-	if !ok || token != "ianianso290801" {
+	if err != nil {
 		return addHeaders(events.APIGatewayProxyResponse{Body: string("{\"message\":\"forbidden\""), StatusCode: http.StatusForbidden}, nil)
 	}
+
+	if c.Email == "" {
+		return addHeaders(events.APIGatewayProxyResponse{Body: string("{\"message\":\"forbidden\""), StatusCode: http.StatusForbidden}, nil)
+	}
+
 	if request.HTTPMethod == "GET" {
-		return addHeaders(gh.Handlerable.Get(request))
+		return addHeaders(gh.Handlerable.Get(request, *c))
 	}
 	if request.HTTPMethod == "POST" {
-		return addHeaders(gh.Handlerable.Create(request))
+		return addHeaders(gh.Handlerable.Create(request, *c))
 	}
 	if request.HTTPMethod == "PUT" {
-		return addHeaders(gh.Handlerable.Update(request))
+		return addHeaders(gh.Handlerable.Update(request, *c))
 	}
 	if request.HTTPMethod == "DELETE" {
-		return addHeaders(gh.Handlerable.Delete(request))
+		return addHeaders(gh.Handlerable.Delete(request, *c))
 	}
 	panic("GenericHandler is prepared to GET, POST, PUT and DELETE")
 }

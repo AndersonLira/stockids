@@ -5,7 +5,12 @@
 #aws lambda create-function --function-name test --runtime go1.x --role  arn:aws:iam::933879187873:policy/service-role/AWSLambdaBasicExecutionRole-4e3bc5ea-295c-4544-a212-a079f15bf7d8 --handler logs --zip-file fileb://logs.zip
 
 
-declare -A lambdas=( ["logs"]="skLog" ["children"]="GetChildren" ["family"]="skFamily")
+declare -A lambdas=( 
+    ["logs"]="skLog" 
+    ["children"]="GetChildren" 
+    ["family"]="skFamily"
+    ["user"]="skUser"
+    )
 name=$1
 funcName="${lambdas[$name]}"
 go build -o $name/$name $name/*.go && \

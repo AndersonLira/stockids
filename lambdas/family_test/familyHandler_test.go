@@ -1,6 +1,7 @@
 package family_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	lt "github.com/andersonlira/stockids/lambdas_test"
@@ -28,7 +29,7 @@ var origin = `
 `
 
 func TestFamilyHandler(t *testing.T) {
-	payload := lt.GetPayload()
+	payload := lt.GetPayload("POST")
 	response, err := gli.Run(gli.Input{
 		Port:    8001,
 		Payload: payload,
@@ -38,8 +39,11 @@ func TestFamilyHandler(t *testing.T) {
 		t.Errorf("Error was not expected here, but %v", err)
 	}
 
-	if response != nil {
-		t.Errorf("response: %v", string(response))
+	result := make(map[string]interface{})
+	json.Unmarshal(response, &result)
+
+	if v, ok := result["statusCode"]; !ok || v.(float64) != 400 {
+		t.Errorf("Bad request expected, but %v", response)
 	}
 
 }

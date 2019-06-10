@@ -15,3 +15,8 @@ func InvalidPathParam() (events.APIGatewayProxyResponse, error) {
 func Conflict() (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{Body: "CONFLICT. DATA IS INVALID", StatusCode: http.StatusConflict}, nil
 }
+
+//BadRequest when body data is invalid
+func BadRequest() (events.APIGatewayProxyResponse, error) {
+	return events.APIGatewayProxyResponse{Body: string("Bad Request"), StatusCode: http.StatusBadRequest}, nil
+}

@@ -25,18 +25,14 @@ func (h FamilyHandler) Get(request events.APIGatewayProxyRequest, claims lambdas
 
 //Create interface implementation
 func (h FamilyHandler) Create(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
-	childID, errPath := request.PathParameters[childParam]
-	if !errPath {
-		return events.APIGatewayProxyResponse{Body: string(childID), StatusCode: http.StatusBadRequest}, nil
-	}
 
 	family := model.Family{}
 	err := json.Unmarshal([]byte(request.Body), &family)
 
 	if err != nil {
-		return events.APIGatewayProxyResponse{}, err
+		return lambdas.BadRequest()
 	}
-	family.UserID = "teste"
+	family.UserID = claims.Email
 
 	family, err = createFamily(family)
 

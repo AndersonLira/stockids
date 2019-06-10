@@ -1,9 +1,9 @@
 package lambdas_test
 
 //GetPayload returns default payloads for lambdas test
-func GetPayload() map[string]interface{} {
+func GetPayload(method string) map[string]interface{} {
 	payload := make(map[string]interface{})
-	payload["httpMethod"] = "GET"
+	payload["httpMethod"] = method
 	requestContext := make(map[string]interface{})
 	authorizer := map[string]interface{}{
 		"claims": map[string]string{

@@ -55,7 +55,7 @@ func (h FamilyHandler) Update(request events.APIGatewayProxyRequest, claims lamb
 }
 
 //Delete interface implementation
-func (h FamilyHandler, claims lambdas.Claims) Delete(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func (h FamilyHandler) Delete(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
 	userID := "teste"
 	id, _ := request.PathParameters["id"]
 	if deleteAllFamiliesOfUser(id, userID) {

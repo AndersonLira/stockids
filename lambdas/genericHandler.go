@@ -20,12 +20,12 @@ func (gh *GenericHandler) Handler(request events.APIGatewayProxyRequest) (events
 	}
 
 	c, err := GetClaims(request)
-
 	if err != nil {
 		return addHeaders(events.APIGatewayProxyResponse{Body: string("{\"message\":\"forbidden\""), StatusCode: http.StatusForbidden}, nil)
 	}
 
 	if c.Email == "" {
+		panic("XXXXXsdfasdfa")
 		return addHeaders(events.APIGatewayProxyResponse{Body: string("{\"message\":\"forbidden\""), StatusCode: http.StatusForbidden}, nil)
 	}
 

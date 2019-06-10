@@ -5,12 +5,26 @@ import (
 	"os"
 
 	"github.com/andersonlira/stockids/db"
+	"github.com/andersonlira/stockids/model"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
+var tables = []model.Tableable{
+	&model.Family{},
+}
+
 func CreateTables() {
-	createFamilyTable()
+	for index, _ := range tables {
+		t := tables[index]
+		props := GetModelProps(t)
+		fmt.Println(t.GetTableName())
+		for _, p := range props {
+			fmt.Printf("   %v\n", p.FieldName)
+		}
+	}
+
+	//createFamilyTable()
 }
 
 func createFamilyTable() {

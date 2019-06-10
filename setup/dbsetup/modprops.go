@@ -11,6 +11,7 @@ type ModelProp struct {
 	FieldName    string
 	FieldIndex   bool
 	FieldKeyType string
+	FieldType    string
 }
 
 //GetModelProps return a list of ModelProp of giving interface
@@ -22,6 +23,7 @@ func GetModelProps(m interface{}) []ModelProp {
 	for i := 0; i < val.NumField(); i++ {
 
 		typeField := val.Type().Field(i)
+		valField := val.Field(i)
 		tag := typeField.Tag
 		isIndex, keyType := getDynamoProperties(tag.Get("dynamo"))
 
@@ -29,6 +31,7 @@ func GetModelProps(m interface{}) []ModelProp {
 			FieldName:    tag.Get("json"),
 			FieldIndex:   isIndex,
 			FieldKeyType: keyType,
+			FieldType:    getFieldType(valField.Interface()),
 		})
 	}
 
@@ -45,4 +48,15 @@ func getDynamoProperties(tag string) (isIndex bool, keyType string) {
 		}
 	}
 	return
+}
+
+func getFieldType(i interface{}) string {
+	switch i.(type) {
+	case string:
+		return "S"
+	case int, int8, int16, int32, int64:
+		return "N"
+	default:
+		return "B"
+	}
 }

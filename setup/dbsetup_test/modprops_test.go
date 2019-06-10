@@ -18,6 +18,7 @@ func TestGetModelProps(t *testing.T) {
 
 	propID := dbsetup.ModelProp{}
 	propName := dbsetup.ModelProp{}
+	propDate := dbsetup.ModelProp{}
 
 	for _, p := range props {
 		if p.FieldName == "id" {
@@ -25,6 +26,9 @@ func TestGetModelProps(t *testing.T) {
 		}
 		if p.FieldName == "name" {
 			propName = p
+		}
+		if p.FieldName == "created_at" {
+			propDate = p
 		}
 
 	}
@@ -47,6 +51,14 @@ func TestGetModelProps(t *testing.T) {
 
 	if propName.FieldKeyType != "" {
 		t.Errorf("FieldName should be '', but %s", propName.FieldKeyType)
+	}
+
+	if propID.FieldType != "S" {
+		t.Errorf("FielType should be 'S', but %s", propID.FieldType)
+	}
+
+	if propDate.FieldType != "N" {
+		t.Errorf("FielType should be 'N', but %s", propDate.FieldType)
 	}
 
 }

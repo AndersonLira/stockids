@@ -1,10 +1,11 @@
 package dbsetup
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/andersonlira/stockids/db"
+
 	"github.com/andersonlira/stockids/model"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -14,56 +15,54 @@ var tables = []model.Tableable{
 	&model.Family{},
 }
 
+//CreateTables of application
 func CreateTables() {
-	for index, _ := range tables {
-		t := tables[index]
+
+	for _, t := range tables {
 		props := GetModelProps(t)
-		fmt.Println(t.GetTableName())
+		tableName := t.GetTableName()
+
+		log.Printf("Creating table %s", tableName)
+
+		attributeDefinitions := []*dynamodb.AttributeDefinition{}
+		keySchema := []*dynamodb.KeySchemaElement{}
+
 		for _, p := range props {
-			fmt.Printf("   %v\n", p.FieldName)
+
+			if p.FieldIndex {
+				field := dynamodb.AttributeDefinition{
+					AttributeName: aws.String(p.FieldName),
+					AttributeType: aws.String(p.FieldType),
+				}
+
+				attributeDefinitions = append(attributeDefinitions, &field)
+				key := dynamodb.KeySchemaElement{
+					AttributeName: aws.String(p.FieldName),
+					KeyType:       aws.String(p.FieldKeyType),
+				}
+				keySchema = append(keySchema, &key)
+				log.Printf("%s --> %v", tableName, field.AttributeName)
+			}
+
 		}
-	}
 
-	//createFamilyTable()
-}
-
-func createFamilyTable() {
-	// Create table Movies
-	tableName := "skFamily"
-
-	svc := db.GetDB()
-
-	input := &dynamodb.CreateTableInput{
-		AttributeDefinitions: []*dynamodb.AttributeDefinition{
-			{
-				AttributeName: aws.String("avatar"),
-				AttributeType: aws.String("S"),
+		input := &dynamodb.CreateTableInput{
+			AttributeDefinitions: attributeDefinitions,
+			KeySchema:            keySchema,
+			ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+				ReadCapacityUnits:  aws.Int64(1),
+				WriteCapacityUnits: aws.Int64(1),
 			},
-		},
-		KeySchema: []*dynamodb.KeySchemaElement{
-			{
-				AttributeName: aws.String("Year"),
-				KeyType:       aws.String("HASH"),
-			},
-			{
-				AttributeName: aws.String("Title"),
-				KeyType:       aws.String("RANGE"),
-			},
-		},
-		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(1),
-			WriteCapacityUnits: aws.Int64(1),
-		},
-		TableName: aws.String(tableName),
+			TableName: aws.String(tableName),
+		}
+
+		svc := db.GetDB()
+		_, err := svc.CreateTable(input)
+		if err != nil {
+			log.Printf("Got error calling CreateTable: %s", tableName)
+			log.Println(err.Error())
+			os.Exit(1)
+		}
+		log.Printf("Table %s created", tableName)
 	}
-
-	_, err := svc.CreateTable(input)
-	if err != nil {
-		fmt.Println("Got error calling CreateTable:")
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	fmt.Println("Created the table", tableName)
-
 }

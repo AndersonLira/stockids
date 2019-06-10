@@ -4,3 +4,6 @@ lambdas/logs/logs
 lambdas/logs/logs.zip
 lambdas/family/family
 lambdas/family/family.zip
+lambdas/user/user.zip
+lambdas/user/user
+lambdas/aws-auth-data.json

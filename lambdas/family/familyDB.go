@@ -10,18 +10,34 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
 )
 
 const table = "skFamily"
 
-func getFamilies(childID string) []model.Family {
+func getFamilies(userID string) []model.Family {
 
-	queryInput := defaultFamilyQuery()
-	queryInput.KeyConditionExpression = aws.String("id = :a")
-	queryInput.ExpressionAttributeValues[":a"] = &dynamodb.AttributeValue{
-		S: aws.String(childID),
+	filt := expression.Name("user_id").Equal(expression.Value(userID))
+	expr, _ := expression.NewBuilder().WithFilter(filt).Build()
+	params := &dynamodb.ScanInput{
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+		FilterExpression:          expr.Filter(),
+		ProjectionExpression:      expr.Projection(),
+		TableName:                 aws.String(table),
 	}
-	return getFamiliesByQuery(queryInput)
+
+	result, _ := db.GetDB().Scan(params)
+	families := []model.Family{}
+	for _, i := range result.Items {
+		family := model.Family{}
+
+		dynamodbattribute.UnmarshalMap(i, &family)
+
+		families = append(families, family)
+
+	}
+	return families
 }
 
 func getFamiliesByQuery(queryInput *dynamodb.QueryInput) []model.Family {
@@ -63,14 +79,12 @@ func createFamily(family model.Family) (model.Family, error) {
 	return family, nil
 }
 
-func deleteAllFamiliesOfUser(id string, userID string) bool {
+//DeleteFamily ...
+func DeleteFamily(ID string) bool {
 	input := &dynamodb.DeleteItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
-				S: aws.String(id),
-			},
-			"user_id": {
-				S: aws.String(userID),
+				S: aws.String(ID),
 			},
 		},
 		TableName: aws.String(table),
@@ -82,6 +96,46 @@ func deleteAllFamiliesOfUser(id string, userID string) bool {
 		return false
 	}
 	return true
+}
+
+//
+func UpdateFamily(ID string) (model.Family, error) {
+	input := &dynamodb.UpdateItemInput{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":d": {
+				S: aws.String("changed"),
+			},
+		},
+		TableName: aws.String(table),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				N: aws.String(ID),
+			},
+		},
+		ReturnValues:     aws.String("UPDATED_NEW"),
+		UpdateExpression: aws.String("set description = :d"),
+	}
+
+	_, err := db.GetDB().UpdateItem(input)
+	if err == nil {
+		return GetFamily(ID)
+	}
+	return model.Family{}, nil
+}
+
+//GetFamily returns family with giving id
+func GetFamily(ID string) (model.Family, error) {
+	result, _ := db.GetDB().GetItem(&dynamodb.GetItemInput{
+		TableName: aws.String(table),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				N: aws.String(ID),
+			},
+		},
+	})
+	family := model.Family{}
+	err := dynamodbattribute.UnmarshalMap(result.Item, &family)
+	return family, err
 }
 
 func defaultFamilyQuery() *dynamodb.QueryInput {

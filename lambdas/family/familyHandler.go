@@ -17,8 +17,7 @@ type FamilyHandler struct {
 
 //Get interface implementation
 func (h FamilyHandler) Get(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
-	childID, _ := request.PathParameters[childParam]
-	families := getFamilies(childID)
+	families := getFamilies(claims.Email)
 	response, _ := json.Marshal(&families)
 	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: 200}, nil
 }
@@ -47,7 +46,25 @@ func (h FamilyHandler) Create(request events.APIGatewayProxyRequest, claims lamb
 
 //Update interface implementation
 func (h FamilyHandler) Update(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
-	panic("Create not implemented yet")
+	ID, errPath := request.PathParameters["id"]
+	if !errPath {
+		return lambdas.InvalidPathParam()
+	}
+	family := model.Family{}
+	err := json.Unmarshal([]byte(request.Body), &family)
+
+	if err != nil {
+		return lambdas.BadRequest()
+	}
+
+	family, err = UpdateFamily(ID)
+
+	if err != nil {
+		return events.APIGatewayProxyResponse{}, err
+	}
+
+	response, _ := json.Marshal(family)
+	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusOK}, nil
 }
 
 //Delete interface implementation

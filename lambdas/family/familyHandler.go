@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/andersonlira/godyn/db"
+
 	"github.com/andersonlira/stockids/lambdas"
 	"github.com/andersonlira/stockids/model"
 	"github.com/aws/aws-lambda-go/events"
@@ -47,17 +49,20 @@ func (h FamilyHandler) Create(request events.APIGatewayProxyRequest, claims lamb
 //Update interface implementation
 func (h FamilyHandler) Update(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
 	ID, errPath := request.PathParameters["id"]
+
 	if !errPath {
 		return lambdas.InvalidPathParam()
 	}
 	family := model.Family{}
 	err := json.Unmarshal([]byte(request.Body), &family)
+	family.ID = ID
+	family.UserID = claims.Email
 
 	if err != nil {
 		return lambdas.BadRequest()
 	}
 
-	family, err = UpdateFamily(ID)
+	err = db.Update(&family)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err
@@ -69,11 +74,5 @@ func (h FamilyHandler) Update(request events.APIGatewayProxyRequest, claims lamb
 
 //Delete interface implementation
 func (h FamilyHandler) Delete(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
-	userID := "teste"
-	id, _ := request.PathParameters["id"]
-	if deleteAllFamiliesOfUser(id, userID) {
-		return events.APIGatewayProxyResponse{Body: "true", StatusCode: http.StatusOK}, nil
-	}
-	return events.APIGatewayProxyResponse{Body: "false", StatusCode: http.StatusNotFound}, nil
-
+	panic("method not implemented yet")
 }

@@ -1,5 +1,28 @@
 package lambdas_test
 
+import (
+	"github.com/andersonlira/godyn/db"
+	"github.com/andersonlira/godyn/model"
+)
+
+//TestHelper is the framework that tests must be executed
+type TestHelper struct {
+	//Tables to be created
+	Tables []model.Entity
+}
+
+func (th *TestHelper) Setup() {
+	for i := range th.Tables {
+		db.CreateTable(th.Tables[i])
+	}
+}
+
+func (th TestHelper) Teardown() {
+	for i := range th.Tables {
+		db.DeleteTable(th.Tables[i])
+	}
+}
+
 //GetPayload returns default payloads for lambdas test
 func GetPayload(method string) map[string]interface{} {
 	payload := make(map[string]interface{})

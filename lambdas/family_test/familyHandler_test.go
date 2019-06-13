@@ -2,16 +2,20 @@ package family_test
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 
+	md "github.com/andersonlira/godyn/model"
 	lt "github.com/andersonlira/stockids/lambdas_test"
 	"github.com/andersonlira/stockids/model"
 	gli "github.com/djhworld/go-lambda-invoke/golambdainvoke"
 )
 
 var familyID string
+var helper = lt.TestHelper{Tables: []md.Entity{&model.Family{}}}
 
 func TestCreateFamily(t *testing.T) {
+	helper.Setup()
 	payload := lt.GetPayload("POST")
 	response, err := gli.Run(gli.Input{
 		Port:    8001,
@@ -89,7 +93,11 @@ func TestGetFamily(t *testing.T) {
 }
 
 func TestUpdateFamily(t *testing.T) {
+	defer helper.Teardown()
 	payload := lt.GetPayload("PUT")
+	pathParameters := make(map[string]string)
+	pathParameters["id"] = familyID
+	payload["pathParameters"] = pathParameters
 
 	family := model.Family{
 		Name:        "Family Test Altered",
@@ -111,8 +119,16 @@ func TestUpdateFamily(t *testing.T) {
 	result := make(map[string]interface{})
 	json.Unmarshal(response, &result)
 
-	if v, ok := result["statusCode"]; !ok || v.(float64) != 200 {
+	v, ok := result["statusCode"]
+
+	if !ok || v.(float64) != 200 {
 		t.Errorf("Update response expected, but %v", string(response))
+	}
+
+	resultBody := (result["body"]).(string)
+
+	if strings.Index(resultBody, "Family Test Altered") < 0 {
+		t.Errorf("Body should have 'Family Test Altered' but %s", resultBody)
 	}
 
 }

@@ -93,7 +93,6 @@ func TestGetFamily(t *testing.T) {
 }
 
 func TestUpdateFamily(t *testing.T) {
-	defer helper.Teardown()
 	payload := lt.GetPayload("PUT")
 	pathParameters := make(map[string]string)
 	pathParameters["id"] = familyID
@@ -129,6 +128,39 @@ func TestUpdateFamily(t *testing.T) {
 
 	if strings.Index(resultBody, "Family Test Altered") < 0 {
 		t.Errorf("Body should have 'Family Test Altered' but %s", resultBody)
+	}
+
+}
+
+func TestDeleteFamily(t *testing.T) {
+	defer helper.Teardown()
+	payload := lt.GetPayload("DELETE")
+	pathParameters := make(map[string]string)
+	pathParameters["id"] = familyID
+	payload["pathParameters"] = pathParameters
+
+	response, err := gli.Run(gli.Input{
+		Port:    8001,
+		Payload: payload,
+	})
+
+	if err != nil {
+		t.Errorf("Error was not expected here, but %v", err)
+	}
+
+	result := make(map[string]interface{})
+	json.Unmarshal(response, &result)
+
+	v, ok := result["statusCode"]
+
+	if !ok || v.(float64) != 200 {
+		t.Errorf("Update response expected, but %v", string(response))
+	}
+
+	resultBody := (result["body"]).(string)
+
+	if strings.Index(resultBody, "true") < 0 {
+		t.Errorf("Body should have true value but %s", resultBody)
 	}
 
 }

@@ -74,5 +74,20 @@ func (h FamilyHandler) Update(request events.APIGatewayProxyRequest, claims lamb
 
 //Delete interface implementation
 func (h FamilyHandler) Delete(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
-	panic("method not implemented yet")
+	ID, errPath := request.PathParameters["id"]
+
+	if !errPath {
+		return lambdas.InvalidPathParam()
+	}
+
+	err := db.Delete(&model.Family{}, []interface{}{ID, claims.Email}...)
+
+	result := make(map[string]bool)
+	result["message"] = err == nil
+	response, _ := json.Marshal(result)
+	if err != nil {
+		return events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusOK}, nil
+	}
+	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusOK}, nil
+
 }

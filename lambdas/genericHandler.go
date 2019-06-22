@@ -25,7 +25,6 @@ func (gh *GenericHandler) Handler(request events.APIGatewayProxyRequest) (events
 	}
 
 	if c.Email == "" {
-		panic("XXXXXsdfasdfa")
 		return addHeaders(events.APIGatewayProxyResponse{Body: string("{\"message\":\"forbidden\""), StatusCode: http.StatusForbidden}, nil)
 	}
 

@@ -9,7 +9,7 @@ import (
 
 func TestGetModelProps(t *testing.T) {
 	fields := 6
-	model := model.Family{}
+	model := model.Child{}
 	props := dbsetup.GetModelProps(&model)
 
 	if len(props) != fields {

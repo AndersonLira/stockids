@@ -9,7 +9,7 @@ import (
 )
 
 var tables = []model.Tableable{
-	&model.Family{},
+	&model.Child{},
 }
 
 //CreateTables of application

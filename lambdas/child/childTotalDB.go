@@ -9,11 +9,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-var familyTotalTable = "skFamilyTotal"
+var childTotalTable = "skChildTotal"
 
-//UpdateFamilyTotal for giving childID.
-//If FamilyTotal not exists, it will create first
-func UpdateFamilyTotal(childID string, score int) (familyTotal FamilyTotal, err error) {
+//UpdateChildTotal for giving childID.
+//If ChildTotal not exists, it will create first
+func UpdateChildTotal(childID string, score int) (childTotal ChildTotal, err error) {
 	ddb := db.GetDB()
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
@@ -21,7 +21,7 @@ func UpdateFamilyTotal(childID string, score int) (familyTotal FamilyTotal, err 
 				N: aws.String(fmt.Sprintf("%d", score)),
 			},
 		},
-		TableName: aws.String(familyTotalTable),
+		TableName: aws.String(childTotalTable),
 		Key: map[string]*dynamodb.AttributeValue{
 			"child_id": {
 				S: aws.String(childID),
@@ -35,13 +35,13 @@ func UpdateFamilyTotal(childID string, score int) (familyTotal FamilyTotal, err 
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 	fmt.Println(err)
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-	return FamilyTotal{}, nil
+	return ChildTotal{}, nil
 }
 
-func getFamilyTotal(childID string) FamilyTotal {
+func getChildTotal(childID string) ChildTotal {
 	ddb := db.GetDB()
 	result, err := ddb.GetItem(&dynamodb.GetItemInput{
-		TableName: aws.String(familyTotalTable),
+		TableName: aws.String(childTotalTable),
 		Key: map[string]*dynamodb.AttributeValue{
 			"child_id": {
 				S: aws.String(childID),
@@ -49,11 +49,11 @@ func getFamilyTotal(childID string) FamilyTotal {
 		},
 	})
 	if err != nil {
-		fmt.Println("Got error querying familyTotals")
+		fmt.Println("Got error querying childTotals")
 		fmt.Println(err.Error())
 	}
 
-	familyTotal := FamilyTotal{}
-	dynamodbattribute.UnmarshalMap(result.Item, &familyTotal)
-	return familyTotal
+	childTotal := ChildTotal{}
+	dynamodbattribute.UnmarshalMap(result.Item, &childTotal)
+	return childTotal
 }

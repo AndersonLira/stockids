@@ -1,4 +1,4 @@
-package family_test
+package child_test
 
 import (
 	"encoding/json"
@@ -11,10 +11,10 @@ import (
 	gli "github.com/djhworld/go-lambda-invoke/golambdainvoke"
 )
 
-var familyID string
-var helper = lt.TestHelper{Tables: []md.Entity{&model.Family{}}}
+var childID string
+var helper = lt.TestHelper{Tables: []md.Entity{&model.Child{}}}
 
-func TestCreateFamily(t *testing.T) {
+func TestCreateChild(t *testing.T) {
 	helper.Setup()
 	payload := lt.GetPayload("POST")
 	response, err := gli.Run(gli.Input{
@@ -33,12 +33,12 @@ func TestCreateFamily(t *testing.T) {
 		t.Errorf("Bad request expected, but %v", string(response))
 	}
 
-	family := model.Family{
-		Name:        "Family Test",
-		Description: "Family from unit test",
+	child := model.Child{
+		Name:        "Child Test",
+		Description: "Child from unit test",
 		Avatar:      "source/avatar",
 	}
-	body, _ := json.Marshal(family)
+	body, _ := json.Marshal(child)
 	payload["body"] = string(body)
 
 	response, err = gli.Run(gli.Input{
@@ -59,7 +59,7 @@ func TestCreateFamily(t *testing.T) {
 
 }
 
-func TestGetFamily(t *testing.T) {
+func TestGetChild(t *testing.T) {
 	payload := lt.GetPayload("GET")
 	response, err := gli.Run(gli.Input{
 		Port:    8001,
@@ -77,33 +77,33 @@ func TestGetFamily(t *testing.T) {
 		t.Errorf("Bad request expected, but %v", string(response))
 	}
 	body := result["body"]
-	list := []model.Family{}
+	list := []model.Child{}
 	json.Unmarshal([]byte(body.(string)), &list)
 	if len(list) != 1 {
 		t.Errorf("List should be an element, but %v", list)
 	}
 
 	item := list[0]
-	if item.Name != "Family Test" {
-		t.Errorf("Family name should be 'Family Test' but %s", item.Name)
+	if item.Name != "Child Test" {
+		t.Errorf("Child name should be 'Child Test' but %s", item.Name)
 	}
 
-	familyID = item.ID
+	childID = item.ID
 
 }
 
-func TestUpdateFamily(t *testing.T) {
+func TestUpdateChild(t *testing.T) {
 	payload := lt.GetPayload("PUT")
 	pathParameters := make(map[string]string)
-	pathParameters["id"] = familyID
+	pathParameters["id"] = childID
 	payload["pathParameters"] = pathParameters
 
-	family := model.Family{
-		Name:        "Family Test Altered",
-		Description: "Family from unit test",
+	child := model.Child{
+		Name:        "Child Test Altered",
+		Description: "Child from unit test",
 		Avatar:      "source/avatar",
 	}
-	body, _ := json.Marshal(family)
+	body, _ := json.Marshal(child)
 	payload["body"] = string(body)
 
 	response, err := gli.Run(gli.Input{
@@ -126,17 +126,17 @@ func TestUpdateFamily(t *testing.T) {
 
 	resultBody := (result["body"]).(string)
 
-	if strings.Index(resultBody, "Family Test Altered") < 0 {
-		t.Errorf("Body should have 'Family Test Altered' but %s", resultBody)
+	if strings.Index(resultBody, "Child Test Altered") < 0 {
+		t.Errorf("Body should have 'Child Test Altered' but %s", resultBody)
 	}
 
 }
 
-func TestDeleteFamily(t *testing.T) {
+func TestDeleteChild(t *testing.T) {
 	defer helper.Teardown()
 	payload := lt.GetPayload("DELETE")
 	pathParameters := make(map[string]string)
-	pathParameters["id"] = familyID
+	pathParameters["id"] = childID
 	payload["pathParameters"] = pathParameters
 
 	response, err := gli.Run(gli.Input{

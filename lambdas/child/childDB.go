@@ -13,9 +13,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
 )
 
-const table = "skFamily"
+const table = "skChild"
 
-func getFamilies(userID string) []model.Family {
+func getChildren(userID string) []model.Child {
 
 	filt := expression.Name("user_id").Equal(expression.Value(userID))
 	expr, _ := expression.NewBuilder().WithFilter(filt).Build()
@@ -28,43 +28,43 @@ func getFamilies(userID string) []model.Family {
 	}
 
 	result, _ := db.GetDB().Scan(params)
-	families := []model.Family{}
+	fhildren := []model.Child{}
 	for _, i := range result.Items {
-		family := model.Family{}
+		child := model.Child{}
 
-		dynamodbattribute.UnmarshalMap(i, &family)
+		dynamodbattribute.UnmarshalMap(i, &child)
 
-		families = append(families, family)
+		fhildren = append(fhildren, child)
 
 	}
-	return families
+	return fhildren
 }
 
-func getFamiliesByQuery(queryInput *dynamodb.QueryInput) []model.Family {
+func getChildrenByQuery(queryInput *dynamodb.QueryInput) []model.Child {
 	ddb := db.GetDB()
 	result, err := ddb.Query(queryInput)
 
 	if err != nil {
-		fmt.Println("Got error querying families")
+		fmt.Println("Got error querying fhildren")
 		fmt.Println(err.Error())
 	}
 
-	families := []model.Family{}
+	fhildren := []model.Child{}
 	for _, i := range result.Items {
-		family := model.Family{}
-		err = dynamodbattribute.UnmarshalMap(i, &family)
-		families = append(families, family)
+		child := model.Child{}
+		err = dynamodbattribute.UnmarshalMap(i, &child)
+		fhildren = append(fhildren, child)
 	}
-	return families
+	return fhildren
 
 }
 
-func createFamily(family model.Family) (model.Family, error) {
-	family.ID = str.NewUUID()
-	family.CreatedAt = time.Now().Unix()
-	av, err := dynamodbattribute.MarshalMap(family)
+func createChild(child model.Child) (model.Child, error) {
+	child.ID = str.NewUUID()
+	child.CreatedAt = time.Now().Unix()
+	av, err := dynamodbattribute.MarshalMap(child)
 	if err != nil {
-		return model.Family{}, err
+		return model.Child{}, err
 	}
 
 	input := &dynamodb.PutItemInput{
@@ -74,13 +74,13 @@ func createFamily(family model.Family) (model.Family, error) {
 	ddb := db.GetDB()
 	_, err = ddb.PutItem(input)
 	if err != nil {
-		return model.Family{}, err
+		return model.Child{}, err
 	}
-	return family, nil
+	return child, nil
 }
 
-//DeleteFamily ...
-func DeleteFamily(ID string) bool {
+//DeleteChild ...
+func DeleteChild(ID string) bool {
 	input := &dynamodb.DeleteItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
@@ -99,7 +99,7 @@ func DeleteFamily(ID string) bool {
 }
 
 //
-func UpdateFamily(ID string) (model.Family, error) {
+func UpdateChild(ID string) (model.Child, error) {
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":d": {
@@ -118,13 +118,13 @@ func UpdateFamily(ID string) (model.Family, error) {
 
 	_, err := db.GetDB().UpdateItem(input)
 	if err == nil {
-		return GetFamily(ID)
+		return GetChild(ID)
 	}
-	return model.Family{}, nil
+	return model.Child{}, nil
 }
 
-//GetFamily returns family with giving id
-func GetFamily(ID string) (model.Family, error) {
+//GetChild returns child with giving id
+func GetChild(ID string) (model.Child, error) {
 	result, _ := db.GetDB().GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String(table),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -133,12 +133,12 @@ func GetFamily(ID string) (model.Family, error) {
 			},
 		},
 	})
-	family := model.Family{}
-	err := dynamodbattribute.UnmarshalMap(result.Item, &family)
-	return family, err
+	child := model.Child{}
+	err := dynamodbattribute.UnmarshalMap(result.Item, &child)
+	return child, err
 }
 
-func defaultFamilyQuery() *dynamodb.QueryInput {
+func defaultChildQuery() *dynamodb.QueryInput {
 	return &dynamodb.QueryInput{
 		TableName:                 aws.String(table),
 		ScanIndexForward:          aws.Bool(false),

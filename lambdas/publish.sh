@@ -7,8 +7,8 @@
 
 declare -A lambdas=( 
     ["logs"]="skLog" 
-    ["children"]="GetChildren" 
-    ["family"]="skFamily"
+    ["child"]="skChild" 
+    ["child"]="skChild"
     ["user"]="skUser"
     )
 name=$1

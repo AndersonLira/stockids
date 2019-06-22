@@ -1,4 +1,4 @@
-aws dynamodb scan --table-name skFamily  --endpoint-url http://localhost:8000 --filter-expression "user_id = :a"  --expression-attribute-values values.json
+aws dynamodb scan --table-name skChild  --endpoint-url http://localhost:8000 --filter-expression "user_id = :a"  --expression-attribute-values values.json
 
 
 value.json

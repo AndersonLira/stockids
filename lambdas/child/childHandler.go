@@ -13,74 +13,74 @@ import (
 
 const childParam = "childId"
 
-//FamilyHandler implements GenericHandler
-type FamilyHandler struct {
+//ChildHandler implements GenericHandler
+type ChildHandler struct {
 }
 
 //Get interface implementation
-func (h FamilyHandler) Get(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
-	families := getFamilies(claims.Username)
-	response, _ := json.Marshal(&families)
+func (h ChildHandler) Get(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
+	fhildren := getChildren(claims.Username)
+	response, _ := json.Marshal(&fhildren)
 	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: 200}, nil
 }
 
 //Create interface implementation
-func (h FamilyHandler) Create(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
+func (h ChildHandler) Create(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
 
-	family := model.Family{}
-	err := json.Unmarshal([]byte(request.Body), &family)
+	child := model.Child{}
+	err := json.Unmarshal([]byte(request.Body), &child)
 
 	if err != nil {
 		return lambdas.BadRequest()
 	}
-	family.UserID = claims.Username
+	child.UserID = claims.Username
 
-	family, err = createFamily(family)
+	child, err = createChild(child)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err
 	}
 
-	response, _ := json.Marshal(family)
+	response, _ := json.Marshal(child)
 	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusCreated}, nil
 
 }
 
 //Update interface implementation
-func (h FamilyHandler) Update(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
+func (h ChildHandler) Update(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
 	ID, errPath := request.PathParameters["id"]
 
 	if !errPath {
 		return lambdas.InvalidPathParam()
 	}
-	family := model.Family{}
-	err := json.Unmarshal([]byte(request.Body), &family)
-	family.ID = ID
-	family.UserID = claims.Username
+	child := model.Child{}
+	err := json.Unmarshal([]byte(request.Body), &child)
+	child.ID = ID
+	child.UserID = claims.Username
 
 	if err != nil {
 		return lambdas.BadRequest()
 	}
 
-	err = db.Update(&family)
+	err = db.Update(&child)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err
 	}
 
-	response, _ := json.Marshal(family)
+	response, _ := json.Marshal(child)
 	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: http.StatusOK}, nil
 }
 
 //Delete interface implementation
-func (h FamilyHandler) Delete(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
+func (h ChildHandler) Delete(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
 	ID, errPath := request.PathParameters["id"]
 
 	if !errPath {
 		return lambdas.InvalidPathParam()
 	}
 
-	err := db.Delete(&model.Family{}, []interface{}{ID, claims.Username}...)
+	err := db.Delete(&model.Child{}, []interface{}{ID, claims.Username}...)
 
 	result := make(map[string]bool)
 	result["message"] = err == nil

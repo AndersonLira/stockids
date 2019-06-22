@@ -1,4 +1,4 @@
-#test family lambda
+#test child lambda
 echo Testing $1 lambda
 
 echo GET 
@@ -7,7 +7,7 @@ cat /tmp/$1_get.json
 echo
 
 # echo POST
-# aws lambda invoke --function-name "$1"  --payload '{"pathParameters":{"childId":"teste"},"queryStringParameters":{"token":"ianianso290801"},"httpMethod":"POST","body":"{\"id\":\"\",\"name\":\"Family A\",\"description\":\"A test family\",\"avatar\":\"none\"}"}' /tmp/$1_post.json && \
+# aws lambda invoke --function-name "$1"  --payload '{"pathParameters":{"childId":"teste"},"queryStringParameters":{"token":"ianianso290801"},"httpMethod":"POST","body":"{\"id\":\"\",\"name\":\"Child A\",\"description\":\"A test child\",\"avatar\":\"none\"}"}' /tmp/$1_post.json && \
 # created=$(</tmp/$1_post.json)
 # echo $created
 # echo

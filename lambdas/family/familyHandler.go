@@ -19,7 +19,7 @@ type FamilyHandler struct {
 
 //Get interface implementation
 func (h FamilyHandler) Get(request events.APIGatewayProxyRequest, claims lambdas.Claims) (events.APIGatewayProxyResponse, error) {
-	families := getFamilies(claims.Email)
+	families := getFamilies(claims.Username)
 	response, _ := json.Marshal(&families)
 	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: 200}, nil
 }
@@ -33,7 +33,7 @@ func (h FamilyHandler) Create(request events.APIGatewayProxyRequest, claims lamb
 	if err != nil {
 		return lambdas.BadRequest()
 	}
-	family.UserID = claims.Email
+	family.UserID = claims.Username
 
 	family, err = createFamily(family)
 
@@ -56,7 +56,7 @@ func (h FamilyHandler) Update(request events.APIGatewayProxyRequest, claims lamb
 	family := model.Family{}
 	err := json.Unmarshal([]byte(request.Body), &family)
 	family.ID = ID
-	family.UserID = claims.Email
+	family.UserID = claims.Username
 
 	if err != nil {
 		return lambdas.BadRequest()
@@ -80,7 +80,7 @@ func (h FamilyHandler) Delete(request events.APIGatewayProxyRequest, claims lamb
 		return lambdas.InvalidPathParam()
 	}
 
-	err := db.Delete(&model.Family{}, []interface{}{ID, claims.Email}...)
+	err := db.Delete(&model.Family{}, []interface{}{ID, claims.Username}...)
 
 	result := make(map[string]bool)
 	result["message"] = err == nil

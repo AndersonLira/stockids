@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/andersonlira/goutils/str"
+
 	"github.com/andersonlira/godyn/db"
 
 	"github.com/andersonlira/stockids/lambdas"
@@ -34,8 +36,8 @@ func (h ChildHandler) Create(request events.APIGatewayProxyRequest, claims lambd
 		return lambdas.BadRequest()
 	}
 	child.UserID = claims.Username
-
-	child, err = createChild(child)
+	child.ID = str.NewUUID()
+	err = db.Create(&child)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err

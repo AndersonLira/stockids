@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/andersonlira/goutils/str"
@@ -13,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
 )
 
-const table = "skChild"
+var table = "skChild" + os.Getenv("SK_ENVIRONMENT")
 
 func getChildren(userID string) []model.Child {
 

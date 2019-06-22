@@ -1,5 +1,9 @@
 package model
 
+import (
+	"os"
+)
+
 //Child represents one group
 type Child struct {
 	ID          string `json:"id" dynamo:"hash"`
@@ -12,5 +16,5 @@ type Child struct {
 
 //GetTableName returns table name
 func (Child) GetTableName() string {
-	return "skChild"
+	return "skChild" + os.Getenv("SK_ENVIRONMENT")
 }
